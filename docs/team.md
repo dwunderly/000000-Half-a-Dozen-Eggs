@@ -6,11 +6,11 @@ title:  Team
 # {{ page.title }}
 
 
-## USER 1
+## David Wunderly
 ***UCI Net ID***: dwunderl
 
-## USER 2
+## Vivek Mogili
 ***UCI Net ID***: mogiliv
 
-## USER 3
+## Henry Smith
 ***UCI Net ID***: hgsmith
