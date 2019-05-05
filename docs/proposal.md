@@ -4,10 +4,16 @@ title: Proposal
 ---
 
 ## Summary of the Project
-The agent will be placed in a cave that contains a number of ores. The agent is tasked with collecting as much valuable ore as possible and returning to the start location before an amount of time elapses. Different ores will have different point values. The agent must seek out and mine the ores.
+The agent is going to attempt to navigate a 3D platforming environment towards a known goal. The agent will have information on its immediate surroundings, and its distance to the goal. The agent will have a limited pool of actions which it can perform, such as strafe one block, walk one block forward, or jump two blocks forward.
 
 ## AI/ML Algorithms
-Machine learning with reinforcement learning.
+The agent will use 
 
 ## Evaluation Plan
-A point value will be assigned to each ore. The score is determined by how many of each ore the agent can collect and return to the starting point within the alloted time.
+A score will be derived based on distance to the goal and time taken to get there.
+
+## Prototype Goals
+The first prototype will aim to navigate simple flat bridges with some holes. The agent will only be able to perceive the immediate 5x5 surroundings. And the agent will only be able to perform the following moves: walk 1 left/right/forward/backward, jump 2 forward.
+
+## Future Goals
+As the prototype is clearly very simple, a number of goals for the future have been created. Goals include changing the number of moves available to offer more degrees of freedom, increasing the field of vision, and creating more advanced and sparser environments. If the project is still too simple, we aim to transition to solving 3d platforming puzzles.
