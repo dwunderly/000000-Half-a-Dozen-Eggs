@@ -7,7 +7,7 @@ title: Proposal
 The agent is going to attempt to navigate a 3D platforming environment towards a known goal. The agent will have information on its immediate surroundings, and its distance to the goal. The agent will have a limited pool of actions which it can perform, such as strafe one block, walk one block forward, or jump two blocks forward.
 
 ## AI/ML Algorithms
-The agent will use 
+The agent will be trained using reinforcement learning. The AI turns the state (the immediate 5x5 surrounding blocks) and represent this as a vector. This vector is transformed by a weight matrix into a smaller vector representing which action the agent should perform. If the action reduces the distance to the goal, the weights are increased representing "rewarding" this behaviour. If the action increases the distance or causes the agent to fall the weights are decreased. 
 
 ## Evaluation Plan
 A score will be derived based on distance to the goal and time taken to get there.
