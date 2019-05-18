@@ -40,11 +40,10 @@ class Level:
     
     def getVector(self):
         ret = []
-        for y in range(self.playerPos[1] - Level.ViewHeight//2-1,
-                       self.playerPos[1] + Level.ViewHeight//2):
-            for x in range(self.playerPos[0] - Level.ViewWidth//2-1,
-                           self.playerPos[0] + Level.ViewWidth//2):
-                print(x,y)
+        for y in range(self.playerPos[1] - Level.ViewHeight//2,
+                       self.playerPos[1] + Level.ViewHeight//2+1):
+            for x in range(self.playerPos[0] - Level.ViewWidth//2,
+                           self.playerPos[0] + Level.ViewWidth//2+1):
                 ret += [self.getBlock(x, y)]
         return ret
     
@@ -78,8 +77,7 @@ class Level:
             self.Reset()
             return -100
         return 1
-            
-
+    
     def Reset(self):
         self.playerPos = list(self.initialPos)
 
