@@ -15,6 +15,8 @@ class Level:
         self.initialPos = None
         self.playerPos = None
         self.map = []
+        self.reward = 0
+        self.previousPos = None
 
         for y, string in enumerate(stringArray):
             self.map += [[]]
@@ -48,38 +50,65 @@ class Level:
         return ret
     
     def moveUp(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[1] -= 1
+        self.reward += -1
         
     def moveLeft(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[0] -= 1
+        reward += -1
 
     def moveRight(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[0] += 1
+        self.reward += -1
 
     def moveDown(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[1] += 1
+        self.reward += -1
 
     def jumpUp(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[1] -= 2
+        self.reward += -3
 
     def jumpLeft(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[0] -= 2
+        self.reward += -3
 
     def jumpRight(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[0] += 2
+        self.reward += -3
 
     def jumpDown(self):
+        self.previousPos = tuple(self.playerPos)
         self.playerPos[1] += 2
+        self.reward += -3
 
     def Act(self, index):
         Level.Actions[index](self)
         if(self.getBlock(self.playerPos[0],self.playerPos[1]) == 0):
             self.Reset()
-            return -100
-        return 1
+            self.reward += -100
+        else if(self.playerPos[1] == 0):
+            self.reward += 100
+        else if(self.playerPos[1] > self.previoudPos[1]):
+            self.reward += 10
+        else
+            self.reward += 4
+        return self.flushReward()
     
     def Reset(self):
         self.playerPos = list(self.initialPos)
+
+    def flushReward(self):
+        ret = self.reward
+        self.reward = 0
+        return ret
 
     def __str__(self):
         s = ""
