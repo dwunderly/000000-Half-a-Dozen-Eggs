@@ -57,7 +57,7 @@ class Level:
     def moveLeft(self):
         self.previousPos = tuple(self.playerPos)
         self.playerPos[0] -= 1
-        reward += -1
+        self.reward += -1
 
     def moveRight(self):
         self.previousPos = tuple(self.playerPos)
@@ -94,11 +94,11 @@ class Level:
         if(self.getBlock(self.playerPos[0],self.playerPos[1]) == 0):
             self.Reset()
             self.reward += -100
-        else if(self.playerPos[1] == 0):
+        elif(self.playerPos[1] == 0):
             self.reward += 100
-        else if(self.playerPos[1] > self.previoudPos[1]):
+        elif(self.playerPos[1] < self.previousPos[1]):
             self.reward += 10
-        else
+        else:
             self.reward += 4
         return self.flushReward()
     
