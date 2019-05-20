@@ -12,11 +12,6 @@ import json
 from random import randrange
 from math import *
 
-if sys.version_info[0] == 2:
-	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)  # flush print output immediately
-else:
-	import functools
-	print = functools.partial(print, flush=True)
 
 
 missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -36,19 +31,19 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 			  </ServerInitialConditions>
 			  <ServerHandlers>
 				  <FlatWorldGenerator generatorString="3;7,44*49,73,35:1,159:4,95:13,35:13,159:11,95:10,159:14,159:6,35:6,95:6;12;"/>
-				  
-				  <ServerQuitFromTimeUp timeLimitMs="300000"/>
+				  <DrawingDecorator>
+					<DrawCuboid x1="-7" y1="0" z1="-9" x2="7" y2="55" z2="5" type="air"/>
+					<DrawCuboid x1="-2" y1="55" z1="-4" x2="2" y2="55" z2="-1" type="stone"/>
+					<DrawCuboid x1="-2" y1="55" z1="0" x2="2" y2="55" z2="3" type="emerald_block"/>
+				  </DrawingDecorator>
 				  <ServerQuitWhenAnyAgentFinishes/>
 				</ServerHandlers>
 			  </ServerSection>
 			  
-			  <AgentSection mode="Survival">
+			  <AgentSection mode="Creative">
 				<Name>MalmoTutorialBot</Name>
 				<AgentStart>
-					<Placement x="0.5" y="56.0" z="0.5" yaw="90"/>
-					<Inventory>
-						<InventoryItem slot="8" type="diamond_pickaxe"/>
-					</Inventory>
+					<Placement x="0.5" y="56.0" z="3.5" yaw="0"/>
 				</AgentStart>
 				<AgentHandlers>
 				  <ObservationFromFullStats/>
@@ -58,11 +53,9 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 						<max x="2" y="-1" z="2"/>
 					  </Grid>
 				  </ObservationFromGrid>
+				  <AbsoluteMovementCommands/>
 				  <DiscreteMovementCommands/>
 				  <InventoryCommands/>
-				  <AgentQuitFromTouchingBlockType>
-					  <Block type="diamond_block" />
-				  </AgentQuitFromTouchingBlockType>
 				  <ObservationFromNearbyEntities> 
 					<Range name="player" xrange="1" yrange="1" zrange="1"/>
 				  </ObservationFromNearbyEntities>
@@ -86,31 +79,38 @@ if agent_host.receivedArgument("help"):
 my_mission = MalmoPython.MissionSpec(missionXML, True)
 my_mission_record = MalmoPython.MissionRecordSpec()
 
-# Attempt to start a mission:
-max_retries = 3
-for retry in range(max_retries):
-	try:
-		agent_host.startMission( my_mission, my_mission_record )
-		break
-	except RuntimeError as e:
-		if retry == max_retries - 1:
-			print("Error starting mission:",e)
-			exit(1)
-		else:
-			time.sleep(2)
+def setup():
+	# Attempt to start a mission:
+	max_retries = 3
+	for retry in range(max_retries):
+		try:
+			agent_host.startMission( my_mission, my_mission_record )
+			break
+		except RuntimeError as e:
+			if retry == max_retries - 1:
+				print("Error starting mission:",e)
+				exit(1)
+			else:
+				time.sleep(2)
 
-# Loop until mission starts:
-print("Waiting for the mission to start ", end=' ')
-world_state = agent_host.getWorldState()
-while not world_state.has_mission_begun:
-	print(".", end="")
-	time.sleep(0.1)
+	# Loop until mission starts:
+	print("Waiting for the mission to start ", end=' ')
 	world_state = agent_host.getWorldState()
-	for error in world_state.errors:
-		print("Error:",error.text)
+	while not world_state.has_mission_begun:
+		print(".", end="")
+		time.sleep(0.1)
+		world_state = agent_host.getWorldState()
+		for error in world_state.errors:
+			print("Error:",error.text)
 
-print()
-print("Mission running ", end=' ')
+	print()
+	print("Mission running ", end=' ')
+	updateState()
+	while(not "observations" in globals()):
+		updateState()
+		time.sleep(0.01)
+	agent_host.sendCommand("tp 0.5 56 -3.5")
+	
 
 def updateState():
 	global observations
@@ -125,144 +125,91 @@ def updateState():
 def coords(i, j):
 	return 5*(i+2) + j + 2
 
-'''
-def walkDirection(offset):
-	TIME = 2
-	updateState()
-	
-	print("New Walk:")
-	print("\tCurrent x: {}".format(observations["XPos"]))
-	print("\tCurrent z: {}".format(observations["ZPos"]))
-	
-	TargetX = float(int(floor(observations["XPos"]))) + 0.5
-	TargetZ = float(int(floor(observations["ZPos"]))) + 0.5
-	
-	
-	
-	print("\tTarget x: {}".format(TargetX))
-	print("\tTarget z: {}".format(TargetZ))
-	
-	
-	rawYaw = observations["Yaw"] + 180.0 + offset
-	yaw = rawYaw % 360
-	yaw -= 180
-	yaw = offset
-	#Negative Z
-	if (abs(yaw) >= 135):
-		TargetZ -= 1
-	#Positive Z
-	elif (abs(yaw) <= 45):
-		TargetZ += 1
-	#Negative X
-	elif (yaw > 0):
-		TargetX -= 1
-	#Positive X
-	else:
-		TargetX += 1
-	
-		
-	print("\tTarget x: {}".format(TargetX))
-	print("\tTarget z: {}".format(TargetZ))
-	
-	x = observations["XPos"] - TargetX
-	z = observations["ZPos"] - TargetZ
-	
-	distance = 0
-	
-	if (abs(x) > abs(z)):
-		distance = abs(x)
-	else:
-		distance = abs(z)
-	
-	#distance = sqrt(((observations["XPos"] - TargetX)**2) + ((observations["ZPos"] - TargetZ)**2))
-	print("\t\tDistance: {}".format(distance))
-	speedMod = 1 / (4.3 * TIME)
-	move =  distance * speedMod
-	strafe =  distance * speedMod
-
-	
-	
-	if (abs(x) > abs(z)):
-		agent_host.sendCommand("move {}".format(move))
-	
-	else:
-		agent_host.sendCommand("strafe {}".format(strafe))
-		
-	time.sleep(TIME-.025)
-		
-	agent_host.sendCommand("strafe 0")
-	agent_host.sendCommand("move 0")
-
-agent_host.sendCommand("pitch 1") #Start looking downward slowly
-time.sleep(1.5)                        #Wait a second until we are looking in roughly the right direction
-agent_host.sendCommand("pitch 0")    #Stop tilting the camera
-
-
-'''
-
-while world_state.is_mission_running:
-
-	updateState()
-	i = randrange(0,8)
-	#Walk Forward
-	if (i == 0):
-		#walkDirection(-180)
-		agent_host.sendCommand("move 1")
-	#Walk Left
-	elif (i == 1):
-		#walkDirection(0)
-		agent_host.sendCommand("strafe -1")
-	#Walk Right
-	elif (i == 2):
-		#walkDirection(-90)
-		agent_host.sendCommand("strafe 1")
-	#Walk Backward
-	elif (i == 3):
-		#walkDirection(90)
-		agent_host.sendCommand("move -1")
-	#Jump Forward
-	elif (i == 4):
-		#walkDirection(-180)
-		agent_host.sendCommand("move 1")
-		agent_host.sendCommand("move 1")
-	#Jump Left
-	elif (i == 5):
-		#walkDirection(0)
-		agent_host.sendCommand("strafe -1")
-		agent_host.sendCommand("strafe -1")
-	#Jump Right
-	elif (i == 6):
-		#walkDirection(-90)
-		agent_host.sendCommand("strafe 1")
-		agent_host.sendCommand("strafe 1")
-	#Jump Backward
-	elif (i == 7):
-		#walkDirection(90)
-		agent_host.sendCommand("move -1")
-		agent_host.sendCommand("move -1")
-	if (i <= 3):
-		time.sleep(0.25)
-	else:
-		print ("jumped")
-		time.sleep(0.6)
-	updateState()
-	print("x: {}".format(int(observations["XPos"])))
-	print("z: {}".format(int(observations["ZPos"])))
-	grid = observations.get(u'floor', 0)
-	floorGrid = []
-	for g in grid:
-		if (g == "air"):
-			floorGrid.append(0)
-		else:
-			floorGrid.append(1)
-	
+def printFloor(floorGrid):
 	for i in range (-2,3):
 		for j in range(-2,3):
 			print(floorGrid[coords(i,j)],end="\t")
 		print()
-	
 	print()
 
-print()
-print("Mission ended")
-# Mission has ended.
+def movementLoop():
+	while world_state.is_mission_running:
+		i = randrange(0,8)
+		#Walk Forward
+		if (i == 0):
+			#walkDirection(-180)
+			agent_host.sendCommand("move 1")
+		#Walk Left
+		elif (i == 1):
+			#walkDirection(0)
+			agent_host.sendCommand("strafe -1")
+		#Walk Right
+		elif (i == 2):
+			#walkDirection(-90)
+			agent_host.sendCommand("strafe 1")
+		#Walk Backward
+		elif (i == 3):
+			#walkDirection(90)
+			agent_host.sendCommand("move -1")
+		#Jump Forward
+		elif (i == 4):
+			#walkDirection(-180)
+			agent_host.sendCommand("move 1")
+			agent_host.sendCommand("move 1")
+		#Jump Left
+		elif (i == 5):
+			#walkDirection(0)
+			agent_host.sendCommand("strafe -1")
+			agent_host.sendCommand("strafe -1")
+		#Jump Right
+		elif (i == 6):
+			#walkDirection(-90)
+			agent_host.sendCommand("strafe 1")
+			agent_host.sendCommand("strafe 1")
+		#Jump Backward
+		elif (i == 7):
+			#walkDirection(90)
+			agent_host.sendCommand("move -1")
+			agent_host.sendCommand("move -1")
+		if (i <= 3):
+			time.sleep(0.25)
+		else:
+			#print ("jumped")
+			time.sleep(0.6)
+
+		updateState()
+		#print("x: {}".format(int(observations["XPos"])))
+		#print("z: {}".format(int(observations["ZPos"])))
+		grid = observations.get(u'floor', 0)
+		floorGrid = []
+		for g in grid:
+			if (g == "air"):
+				floorGrid.append(0)
+			else:
+				floorGrid.append(1)
+		#printFloor(floorGrid)
+		dead = not floorGrid[coords(0,0)]
+		distance = observations["ZPos"]
+		
+		if dead:
+			return 1
+		if distance >= 0:
+			return 0
+		
+
+if __name__ == "__main__":
+	
+	setup()
+	failures = 0
+	successes = 0
+	while(True):
+		while(movementLoop()):
+			failures += 1
+			print("Failure - Succeeded {}/{} times".format(successes, failures+successes))
+			agent_host.sendCommand("tp 0.5 56 -3.5")
+		successes += 1
+		print("Success - Succeeded {}/{} times".format(successes, failures+successes))
+		agent_host.sendCommand("tp 0.5 56 -3.5")
+	print()
+	print("Mission ended")
+	# Mission has ended.
