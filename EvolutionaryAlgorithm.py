@@ -15,7 +15,6 @@ class NN:
         copy.mat = np.copy(self.mat)
         return copy
 
-lev = Simulation.Level(Simulation.l)
 generation = []
 generationT = []
 best = None
@@ -28,15 +27,21 @@ def initialize():
     for j in range(100):
         r = None
         while r == None:
-            f = generation[j].forward(np.array(lev.getVector()))
+            f = generation[j].forward(np.array(getState()))
             i = np.argmax(f)
-            r = lev.Act(i)
+            r = step(i)
         generationT.append((r, j))
 
     generationT.sort()
     best = generation[generationT[-1][1]].dup()
 
-def step():
+def getState():
+    pass
+
+def step(actIndex):
+    pass
+
+def newGeneration():
     global best
     for i in range(100):
         c = best.dup()
@@ -46,9 +51,9 @@ def step():
     for j in range(100):
         r = None
         while r == None:
-            f = generation[j].forward(np.array(lev.getVector()))
+            f = generation[j].forward(np.array(getState()))
             i = np.argmax(f)
-            r = lev.Act(i)
+            r = step(i)
         generationT[j] = (r, j)
 
     generationT.sort()
