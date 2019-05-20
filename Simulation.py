@@ -1,6 +1,6 @@
 l = ["1111111",
      "0000001",
-     "0111111",
+     "0110111",
      "0001000",
      "0111111",
      "0100001",
@@ -75,9 +75,9 @@ class Level:
     def Act(self, index):
         Level.Actions[index](self)
         self.steps += 1
-        ret = False
-        if(self.getBlock(self.playerPos[0], self.playerPos[1]) == 0):
-            ret = (False, self.playerPos[1], -self.steps)
+        ret = None
+        if(self.getBlock(self.playerPos[0], self.playerPos[1]) == 0 or self.steps >= 30):
+            ret = (False, -self.playerPos[1], -self.steps)
             self.Reset()
         if(self.playerPos[1] == 0):
             ret = (True, -self.steps)
