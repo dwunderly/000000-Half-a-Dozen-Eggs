@@ -11,7 +11,7 @@ import time
 import json
 from random import randrange
 from math import *
-
+from EvolutionaryAlgorithm import *
 
 
 missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -34,6 +34,7 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 				  <DrawingDecorator>
 					<DrawCuboid x1="-7" y1="0" z1="-9" x2="7" y2="55" z2="5" type="air"/>
 					<DrawCuboid x1="-2" y1="55" z1="-4" x2="2" y2="55" z2="-1" type="stone"/>
+					<DrawBlock x="0" y="55" z="-1" type="air"/>
 					<DrawCuboid x1="-2" y1="55" z1="0" x2="2" y2="55" z2="3" type="emerald_block"/>
 				  </DrawingDecorator>
 				  <ServerQuitWhenAnyAgentFinishes/>
@@ -131,10 +132,23 @@ def printFloor(floorGrid):
 			print(floorGrid[coords(i,j)],end="\t")
 		print()
 	print()
+	
+def getFloor():
+	grid = observations.get(u'floor', 0)
+	floorGrid = []
+	for g in grid:
+		if (g == "air"):
+			floorGrid.append(0)
+		else:
+			floorGrid.append(1)
+	return floorGrid
 
-def movementLoop():
+def movementLoop(ml, index):
+	steps = 0
 	while world_state.is_mission_running:
-		i = randrange(0,8)
+		updateState()
+		floorGrid = getFloor()
+		i = ml.step(floorGrid,index)
 		#Walk Forward
 		if (i == 0):
 			#walkDirection(-180)
@@ -171,45 +185,48 @@ def movementLoop():
 			#walkDirection(90)
 			agent_host.sendCommand("move -1")
 			agent_host.sendCommand("move -1")
+		
 		if (i <= 3):
-			time.sleep(0.25)
+			steps += 1
 		else:
 			#print ("jumped")
-			time.sleep(0.6)
-
-		updateState()
-		#print("x: {}".format(int(observations["XPos"])))
-		#print("z: {}".format(int(observations["ZPos"])))
-		grid = observations.get(u'floor', 0)
-		floorGrid = []
-		for g in grid:
-			if (g == "air"):
-				floorGrid.append(0)
-			else:
-				floorGrid.append(1)
+			steps += 2
+		#time.sleep(.5)
+		#updateState()
+		
+		while(not updateState()):
+			time.sleep(0.05)
+		floorGrid = getFloor()
+			
 		#printFloor(floorGrid)
 		dead = not floorGrid[coords(0,0)]
 		distance = observations["ZPos"]
 		
-		if dead:
-			return 1
+		if dead :
+			return distance, -steps
 		if distance >= 0:
-			return 0
-		
+			print("Success!")
+			return 0.0, -steps
+		if steps >= 30:
+			return distance, -steps
+	exit()
 
 if __name__ == "__main__":
-	
+	INDEX_MAX = 20
+	ml = Generation(INDEX_MAX, 25, 8)
 	setup()
-	failures = 0
-	successes = 0
+	generations = 0
+	agent_host.sendCommand("look 1")
+	agent_host.sendCommand("look 1")
 	while(True):
-		while(movementLoop()):
-			failures += 1
-			print("Failure - Succeeded {}/{} times".format(successes, failures+successes))
+		ml.beginGeneration()
+		generations += 1
+		print("starting gen {}".format(generations))
+		for index in range(0,INDEX_MAX):
+			print("  Index {}".format(index))
+			ml.update(movementLoop(ml, index), index)
 			agent_host.sendCommand("tp 0.5 56 -3.5")
-		successes += 1
-		print("Success - Succeeded {}/{} times".format(successes, failures+successes))
-		agent_host.sendCommand("tp 0.5 56 -3.5")
+		ml.endGeneration()
 	print()
 	print("Mission ended")
 	# Mission has ended.
