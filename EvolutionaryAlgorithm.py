@@ -29,7 +29,7 @@ class NN:
         return copy
 
 class Generation:
-    def __init__(self, size, shape, action = sig, split = 10, mutateRate = 10):
+    def __init__(self, size, shape, action = sig, split = 5, mutateRate = 10):
         self.size = size
         self.generation = []
         self.action = action
