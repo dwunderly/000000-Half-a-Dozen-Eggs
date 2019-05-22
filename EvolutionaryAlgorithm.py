@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def sig(x):
     return 1./(1.+np.exp(-x))
@@ -29,7 +30,7 @@ class NN:
         return copy
 
 def decayFunction(x):
-    return 1.02 ** -x
+    return 1
 
 class Generation:
     def __init__(self, size, shape, action = sig, split = 5, mutateRate = 10, mutationDecay = decayFunction):
@@ -72,6 +73,7 @@ class Generation:
         self.generationT[index] = (reward, index)
 
     def endGeneration(self):
+        random.shuffle(self.generationT)
         self.generationT.sort()
         self.best = self.generation[self.generationT[-1][1]].dup()
         self.bestScore = self.generationT[-1][0]
@@ -118,6 +120,5 @@ if __name__ == "__main__":
             if(r[0]):
                 sucesses += 1
         g.endGeneration()
-        print(sucesses)
         py.append(g.generationT[-1][0])
         px.append(i)
