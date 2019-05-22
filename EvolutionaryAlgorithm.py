@@ -28,8 +28,11 @@ class NN:
             copy.mats[i] = np.copy(self.mats[i])
         return copy
 
+def decayFunction(x):
+    return 1.02 ** -x
+
 class Generation:
-    def __init__(self, size, shape, action = sig, split = 5, mutateRate = 10):
+    def __init__(self, size, shape, action = sig, split = 5, mutateRate = 10, mutationDecay = decayFunction):
         self.size = size
         self.generation = []
         self.action = action
@@ -39,8 +42,11 @@ class Generation:
         self.split = split
         self.bestScore = None
         self.mutateRate = mutateRate
+        self.generationCount = -1
+        self.mutationDecay = mutationDecay
 
     def beginGeneration(self):
+        self.generationCount += 1
         if(self.best == None):
             for i in range(self.size):
                 self.generation.append(NN(self.shape, self.action))
@@ -54,7 +60,7 @@ class Generation:
                     continue
                 c = toDupG[j % (self.size//self.split)].dup()
                 for i in range(len(c.shape)-1):
-                    c.mats[i] += (np.random.rand(c.shape[i],c.shape[i+1])*2*self.mutateRate)-self.mutateRate
+                    c.mats[i] += np.random.randn(c.shape[i],c.shape[i+1])*self.mutateRate*self.mutationDecay(self.generationCount)
                 self.generation[j] = c
             
     def step(self, state, index):
@@ -72,23 +78,46 @@ class Generation:
 
 if __name__ == "__main__":
     import Simulation
+    import matplotlib.pyplot as plt
+    
     g = Generation(20,(49,20,8))
     l = Simulation.Level(Simulation.l)
+    px = []
+    py = []
     
-    def playBest():
+    def PlayBest():
         l.Reset()
         r = None
         while r == None:
             print(l)
             r = l.Act(np.argmax(g.best.forward(np.array(l.getVector()))))
         print(l)
+
+    def PlotBest():
+        ReachY = []
+        TimeY = []
+        for y in py:
+            if(y[0]):
+                ReachX.append(0)
+                TimeX.append(-y[1])
+            else:
+                ReachX.append(-y[1])
+                TimeX.append(-y[2])
+        plt.plot(px,ReachY,px,TimeY)
+        plt.show()
+                
                 
     for i in range(1000):
+        sucesses = 0
         g.beginGeneration()
         for j in range(20):
             r = None
             while r == None:
                 r = l.Act(g.step(l.getVector(),j))
             g.update(r, j)
+            if(r[0]):
+                sucesses += 1
         g.endGeneration()
-        print(i, g.bestScore)
+        print(sucesses)
+        py.append(g.generationT[-1][0])
+        px.append(i)
