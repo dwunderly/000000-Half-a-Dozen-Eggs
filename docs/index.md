@@ -3,7 +3,7 @@ layout: default
 title:  Home
 ---
 
-Source code: <a href="https://github.com/dwunderly/Bridge-2.0l">GitHub</a>
+Source code: <a href="https://github.com/dwunderly/Bridge-2.0">GitHub</a>
 
 Reports:
 
