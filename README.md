@@ -1,2 +1,2 @@
-# 000000-Half-a-Dozen-Eggs
+# Bridge 2.0
 CS 175 Project
