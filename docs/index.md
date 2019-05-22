@@ -11,4 +11,4 @@ Reports:
 - [Status](status.html)
 - [Final](final.html)
 
-<img src="SampleScreenshot1.png">this is a great image</img>
+<img src="SampleScreenshot1.png"></img>
