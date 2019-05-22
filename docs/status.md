@@ -17,8 +17,10 @@ In order to speed up training time and test the efficacy of our approach, we cre
 
 Evaluation:
 	Because Malmo can run quite slowly at times, we evaluated our prototype on the simulated environment described above. We used python data structures to store the level data and created an interface to control the agent which matched the malmo implementation. This environment allowed us to quickly evaluate the agent on much more complex levels. To confirm that the agent is learning, we tracked the best agent each generation and plotted it’s fitness function over the generations. The image below shows the level the agent was tasked with completing along with the route the final agent decided to take. The graph below shows the stats of the best agent at each generation:
+	
 <img src="Evaluation Graph.png" width="685" height="487">
 <img src="Level.png">
+
 The orange line represents the steps taken before the agent either dies or reaches the end. This line increases for its majority because every time a generation discovers a new technique, it is able to avoid death for longer. Once the agent has reached the goal, it then prioritizes finding faster solutions, hence the drop in the orange line near the end of training. The blue line represents the distance to the goal which is strictly decreasing.
 	As for evaluation in malmo itself, there appear to still be bugs and inconsistencies in how we control the agent in malmo meaning that even the simple level described in the summary has trouble being learned. When we used the same level in the simulation, our agent could consistently find the optimal solution (two forward jumps) and apply it in every future generation. THis indicates that more work must be done before our malmo implementation is ready.
 
