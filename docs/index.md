@@ -11,3 +11,4 @@ Reports:
 - [Status](status.html)
 - [Final](final.html)
 
+<img src="SampleScreenshot1.png"></img>
