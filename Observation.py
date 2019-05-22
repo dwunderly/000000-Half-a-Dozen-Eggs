@@ -32,7 +32,7 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 			  <ServerHandlers>
 				  <FlatWorldGenerator generatorString="3;7,44*49,73,35:1,159:4,95:13,35:13,159:11,95:10,159:14,159:6,35:6,95:6;12;"/>
 				  <DrawingDecorator>
-					<DrawCuboid x1="-7" y1="0" z1="-9" x2="7" y2="55" z2="5" type="air"/>
+					<DrawCuboid x1="-7" y1="2" z1="-9" x2="7" y2="55" z2="5" type="air"/>
 					<DrawCuboid x1="-2" y1="55" z1="-4" x2="2" y2="55" z2="-1" type="stone"/>
 					<DrawBlock x="0" y="55" z="-1" type="air"/>
 					<DrawCuboid x1="-2" y1="55" z1="0" x2="2" y2="55" z2="3" type="emerald_block"/>
@@ -142,49 +142,68 @@ def getFloor():
 		else:
 			floorGrid.append(1)
 	return floorGrid
+	
+def purgatory(x, z):
+	while(True):
+		if (updateState()):
+			if (observations["XPos"] == x):
+				if (observations["ZPos"] == z):
+					return;
+		time.sleep(0.05)
 
 def movementLoop(ml, index):
 	steps = 0
 	while world_state.is_mission_running:
 		updateState()
+		x = observations["XPos"]
+		z = observations["ZPos"]
 		floorGrid = getFloor()
 		i = ml.step(floorGrid,index)
+		print("      Command: {}".format(i))
 		#Walk Forward
 		if (i == 0):
 			#walkDirection(-180)
 			agent_host.sendCommand("move 1")
+			z += 1
 		#Walk Left
 		elif (i == 1):
 			#walkDirection(0)
 			agent_host.sendCommand("strafe -1")
+			x += 1
 		#Walk Right
 		elif (i == 2):
 			#walkDirection(-90)
 			agent_host.sendCommand("strafe 1")
+			x -= 1
 		#Walk Backward
 		elif (i == 3):
 			#walkDirection(90)
 			agent_host.sendCommand("move -1")
+			z -= 1
 		#Jump Forward
 		elif (i == 4):
 			#walkDirection(-180)
+			agent_host.sendCommand("jumpmove 1")
 			agent_host.sendCommand("move 1")
-			agent_host.sendCommand("move 1")
+			z += 2
 		#Jump Left
 		elif (i == 5):
 			#walkDirection(0)
+			agent_host.sendCommand("jumpstrafe -1")
 			agent_host.sendCommand("strafe -1")
-			agent_host.sendCommand("strafe -1")
+			x += 2
 		#Jump Right
 		elif (i == 6):
 			#walkDirection(-90)
+			agent_host.sendCommand("jumpstrafe 1")
 			agent_host.sendCommand("strafe 1")
-			agent_host.sendCommand("strafe 1")
+			x -= 2
 		#Jump Backward
 		elif (i == 7):
 			#walkDirection(90)
+			agent_host.sendCommand("jumpmove -1")
 			agent_host.sendCommand("move -1")
-			agent_host.sendCommand("move -1")
+			z -= 2
 		
 		if (i <= 3):
 			steps += 1
@@ -193,9 +212,13 @@ def movementLoop(ml, index):
 			steps += 2
 		#time.sleep(.5)
 		#updateState()
-		
-		while(not updateState()):
-			time.sleep(0.05)
+		print("      steps: {}".format(steps))
+		#while(not updateState()):
+			#time.sleep(0.05)
+		#time.sleep(0.25)
+		print("      x: {}".format(x))
+		print("      z: {}".format(z))
+		purgatory(x,z)
 		floorGrid = getFloor()
 			
 		#printFloor(floorGrid)
@@ -203,30 +226,37 @@ def movementLoop(ml, index):
 		distance = observations["ZPos"]
 		
 		if dead :
-			return distance, -steps
+			return False, distance, -steps
 		if distance >= 0:
-			print("Success!")
-			return 0.0, -steps
-		if steps >= 30:
-			return distance, -steps
+			return True, 0.0, -steps
+		if steps >= 10:
+			return False, distance, -steps
 	exit()
 
 if __name__ == "__main__":
 	INDEX_MAX = 20
-	ml = Generation(INDEX_MAX, 25, 8)
+	ml = Generation(INDEX_MAX, (25, 10, 8))
 	setup()
 	generations = 0
 	agent_host.sendCommand("look 1")
 	agent_host.sendCommand("look 1")
+	agent_host.sendCommand("tp 0.5 56 -3.5")
+	purgatory(0.5,-3.5)
 	while(True):
 		ml.beginGeneration()
 		generations += 1
 		print("starting gen {}".format(generations))
 		for index in range(0,INDEX_MAX):
 			print("  Index {}".format(index))
-			ml.update(movementLoop(ml, index), index)
+			stats = movementLoop(ml, index)
+			print("    Succeeded: {}".format(stats[0]))
+			print("    Distance: {}".format(stats[1]))
+			print("    Steps: {}".format(stats[2]))
+			ml.update(stats, index)
 			agent_host.sendCommand("tp 0.5 56 -3.5")
+			purgatory(0.5,-3.5)
 		ml.endGeneration()
+		print("Best of Iteration: {}".format(ml.generationT[-1][0]))
 	print()
 	print("Mission ended")
 	# Mission has ended.
