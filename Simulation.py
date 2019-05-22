@@ -1,17 +1,23 @@
 l = ["11111",
      "11111",
+     "01011",
+     "01111",
      "11011",
-     "11111",
-     "11X11"]
+     "10000",
+     "00100",
+     "11011",
+     "10111",
+     "00X11"]
 
 class Level:
     
-    ViewWidth = 5
-    ViewHeight = 5
+    ViewWidth = 7
+    ViewHeight = 7
     
     def __init__(self, stringArray):
         self.initialPos = None
         self.playerPos = None
+        self.previousPos = None
         self.steps = 0
         self.map = []
 
@@ -26,6 +32,7 @@ class Level:
                     self.map[y] += [1]
                     self.playerPos = [x, y]
                     self.initialPos = (x, y)
+                    self.previousPos = (x, y)
                 else:
                     print("Error")
 
@@ -71,11 +78,12 @@ class Level:
         self.playerPos[1] += 2
 
     def Act(self, index):
+        self.previousPos = tuple(self.playerPos)
         Level.Actions[index](self)
         self.steps += 1
         ret = None
         if(self.getBlock(self.playerPos[0], self.playerPos[1]) == 0 or self.steps >= 30):
-            ret = (False, -self.playerPos[1], -self.steps)
+            ret = (False, -self.previousPos[1], -self.steps)
             self.Reset()
         if(self.playerPos[1] == 0):
             ret = (True, -self.steps)

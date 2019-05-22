@@ -29,26 +29,32 @@ class NN:
         return copy
 
 class Generation:
-    def __init__(self, size, shape, action = sig):
+    def __init__(self, size, shape, action = sig, split = 10, mutateRate = 10):
         self.size = size
         self.generation = []
         self.action = action
         self.shape = shape
         self.generationT = [None] * size
         self.best = None
+        self.split = split
+        self.bestScore = None
+        self.mutateRate = mutateRate
 
     def beginGeneration(self):
         if(self.best == None):
             for i in range(self.size):
                 self.generation.append(NN(self.shape, self.action))
         else:
+            toDupG = []
+            for j in range(self.size // self.split):
+                toDupG.append(self.generation[self.generationT[-j][1]])
             for j in range(self.size):
-                if(j == self.size-1):
-                    self.generation[j] = self.best
+                if(self.size - j < self.size//self.split):
+                    self.generation[j] = toDupG[self.size - j]
                     continue
-                c = self.best.dup()
+                c = toDupG[j % (self.size//self.split)].dup()
                 for i in range(len(c.shape)-1):
-                    c.mats[i] += np.random.rand(c.shape[i],c.shape[i+1])
+                    c.mats[i] += (np.random.rand(c.shape[i],c.shape[i+1])*2*self.mutateRate)-self.mutateRate
                 self.generation[j] = c
             
     def step(self, state, index):
@@ -62,11 +68,21 @@ class Generation:
     def endGeneration(self):
         self.generationT.sort()
         self.best = self.generation[self.generationT[-1][1]].dup()
+        self.bestScore = self.generationT[-1][0]
 
 if __name__ == "__main__":
     import Simulation
-    g = Generation(20,(25,8))
+    g = Generation(20,(49,20,8))
     l = Simulation.Level(Simulation.l)
+    
+    def playBest():
+        l.Reset()
+        r = None
+        while r == None:
+            print(l)
+            r = l.Act(np.argmax(g.best.forward(np.array(l.getVector()))))
+        print(l)
+                
     for i in range(1000):
         g.beginGeneration()
         for j in range(20):
@@ -75,3 +91,4 @@ if __name__ == "__main__":
                 r = l.Act(g.step(l.getVector(),j))
             g.update(r, j)
         g.endGeneration()
+        print(i, g.bestScore)
