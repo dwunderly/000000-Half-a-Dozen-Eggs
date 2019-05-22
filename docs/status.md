@@ -22,18 +22,11 @@ Evaluation:
 The orange line represents the steps taken before the agent either dies or reaches the end. This line increases for its majority because every time a generation discovers a new technique, it is able to avoid death for longer. Once the agent has reached the goal, it then prioritizes finding faster solutions, hence the drop in the orange line near the end of training. The blue line represents the distance to the goal which is strictly decreasing.
 	As for evaluation in malmo itself, there appear to still be bugs and inconsistencies in how we control the agent in malmo meaning that even the simple level described in the summary has trouble being learned. When we used the same level in the simulation, our agent could consistently find the optimal solution (two forward jumps) and apply it in every future generation. THis indicates that more work must be done before our malmo implementation is ready.
 
-
 Remaining Goals and Challenges:
-	Our prototype has some success in a discrete environment, but the final agent needs to be able to operate in a continuous environment. 
 
-Continuous vs discrete (zombies and random event platforms)
-Tripwires
-Level generation
-Using a policy learning function and comparing it against our evolutionary learning algorithm
-Moving platforms 
-MALMO IS A PEACE OF SHIT
+The following is a summary of our future goals: We aim to improve the complexity of mazes that our agent can solve, as well as improving its efficiency at solving them. This will be accomplished by fixing a few bugs in our malmo interface, adding layers to our neural net, and using simulated annealing to reduce mutations as time progresses. We also aim to add some degree of randomness to the maze, as to justify using a machine learning approach over a search based approach.
+
+Our main challenge is due to working with malmo. The documentation is nonexistent, with the tutorials doing very little to explain the specific keywords needed to perform essential actions. The latency between malmo and the python interface also prevents an efficient position tracking system.
 
 Resources Used:
-We used NumPy, PyTorch, Matplotlib, and Malmo documentation to help build our prototype. 
-
-
+We used NumPy, PyTorch, Matplotlib, and Malmo documentation to help build our prototype.
