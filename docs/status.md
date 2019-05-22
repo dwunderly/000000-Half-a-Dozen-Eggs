@@ -14,6 +14,8 @@ The A.I. currently trains with a genetic algorithm that uses evolutionary learni
 In order to speed up training time and test the efficacy of our approach, we created a discrete simulation of the Minecraft world the agent will be operating in. In our simulation, the world is a 2D vector of 1s and 0s, and our simulation allows us to grab a vector that represents the 5x5 state that the agent sees. This simulation allows us to manually perform any action from our action set. It also updates the world based on what action we forced the agent to do. It will also allow us to manually reset the world but it also automatically resets after the agent “dies.” 
 
 Evaluation:
+<img src="untitled.png"></img>
+
 
 Remaining Goals and Challenges:
 	Our prototype has some success in a discrete environment, but the final agent needs to be able to operate in a continuous environment. 
