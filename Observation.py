@@ -13,6 +13,37 @@ from random import randrange
 from math import *
 from EvolutionaryAlgorithm import *
 
+key = [ \
+"0111110", \
+"0111110", \
+"0111110", \
+"0111110", \
+"0102010" \
+]
+
+blockTypes = ["air", "stone", "gold_block", "sand"]
+spawn = {'x': 0, 'y': 55, 'z': 0}
+def drawBlock(type, x, y, z):
+	return '<DrawBlock x="{}" y="{}" z="{}" type="{}"/>\n'.format(x,y,z,type)
+
+def makeMaze(key):
+	global spawn
+	z = -1;
+	x = -(int(len(key[0])/2))
+	y = 55
+	result = ""
+	for row in key:
+		for block in row:
+			type = blockTypes[int(block)]
+			result += drawBlock(type, x, y, z)
+			if (type == "gold_block"):
+				spawn['x'] = x+0.5
+				spawn['y'] = y+1
+				spawn['z'] = z+0.5
+			x += 1
+		x = -(int(len(key[0])/2))
+		z -= 1
+	return result
 
 missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 			<Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -32,10 +63,9 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 			  <ServerHandlers>
 				  <FlatWorldGenerator generatorString="3;7,44*49,73,35:1,159:4,95:13,35:13,159:11,95:10,159:14,159:6,35:6,95:6;12;"/>
 				  <DrawingDecorator>
-					<DrawCuboid x1="-7" y1="2" z1="-9" x2="7" y2="55" z2="5" type="air"/>
-					<DrawCuboid x1="-2" y1="55" z1="-4" x2="2" y2="55" z2="-1" type="stone"/>
-					<DrawBlock x="0" y="55" z="-1" type="air"/>
-					<DrawCuboid x1="-2" y1="55" z1="0" x2="2" y2="55" z2="3" type="emerald_block"/>
+					<DrawCuboid x1="-20" y1="2" z1="-20" x2="20" y2="55" z2="5" type="air"/>
+					''' + makeMaze(key) + '''
+					<DrawCuboid x1="-20" y1="55" z1="0" x2="20" y2="55" z2="3" type="emerald_block"/>
 				  </DrawingDecorator>
 				  <ServerQuitWhenAnyAgentFinishes/>
 				</ServerHandlers>
@@ -44,7 +74,7 @@ missionXML='''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 			  <AgentSection mode="Creative">
 				<Name>MalmoTutorialBot</Name>
 				<AgentStart>
-					<Placement x="0.5" y="56.0" z="3.5" yaw="0"/>
+					''' + '<Placement x="{}" y="{}" z="{}" yaw="0"/>'.format(spawn['x'],spawn['y'],spawn['z']) + '''
 				</AgentStart>
 				<AgentHandlers>
 				  <ObservationFromFullStats/>
@@ -240,8 +270,8 @@ if __name__ == "__main__":
 	generations = 0
 	agent_host.sendCommand("look 1")
 	agent_host.sendCommand("look 1")
-	agent_host.sendCommand("tp 0.5 56 -3.5")
-	purgatory(0.5,-3.5)
+	agent_host.sendCommand("tp {} {} {}".format(spawn['x'],spawn['y'],spawn['z']))
+	purgatory(spawn['x'],spawn['z'])
 	while(True):
 		ml.beginGeneration()
 		generations += 1
@@ -253,8 +283,8 @@ if __name__ == "__main__":
 			print("    Distance: {}".format(stats[1]))
 			print("    Steps: {}".format(stats[2]))
 			ml.update(stats, index)
-			agent_host.sendCommand("tp 0.5 56 -3.5")
-			purgatory(0.5,-3.5)
+			agent_host.sendCommand("tp {} {} {}".format(spawn['x'],spawn['y'],spawn['z']))
+			purgatory(spawn['x'],spawn['z'])
 		ml.endGeneration()
 		print("Best of Iteration: {}".format(ml.generationT[-1][0]))
 	print()
