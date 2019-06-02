@@ -109,7 +109,7 @@ class Level:
             return (self.playerPos[1],True)
         elif(self.playerPos[1] <= 0):
             self.Reset()
-            return (self.playerPos[1], True)
+            return (0, True)
         return (self.playerPos[1], False)
 
     def isDead(self, block):
