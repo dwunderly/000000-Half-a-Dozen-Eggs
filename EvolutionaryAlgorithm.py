@@ -82,7 +82,7 @@ if __name__ == "__main__":
     import Simulation
     import matplotlib.pyplot as plt
     
-    g = Generation(20,(49,20,8))
+    g = Generation(20,(98,20,8))
     l = Simulation.Level(Simulation.l)
     px = []
     py = []
@@ -119,6 +119,7 @@ if __name__ == "__main__":
             g.update(r, j)
             if(r[0]):
                 sucesses += 1
+            #print(i,j,r)
         g.endGeneration()
         py.append(g.generationT[-1][0])
         px.append(i)

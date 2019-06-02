@@ -15,6 +15,16 @@ l2 = ["11111",
      "11111",
      "11X11"]
 
+l3 = ["11111",
+     "11111",
+     "32323",
+     "23232",
+     "11111",
+     "11111",
+     "11X11"]
+
+import random
+
 class Level:
     
     ViewWidth = 7
@@ -34,6 +44,10 @@ class Level:
                     self.map[y] += [0]
                 elif char == "1":
                     self.map[y] += [1]
+                elif char == "2":
+                    self.map[y] += [2]
+                elif char == "3":
+                    self.map[y] += [3]
                 elif char == "X":
                     self.map[y] += [1]
                     self.playerPos = [x, y]
@@ -46,7 +60,9 @@ class Level:
             print("Error")
 
     def getBlock(self, X, Y):
-        if(Y < 0 or Y >= len(self.map) or X < 0 or X >= len(self.map[Y])):
+        if(Y < 0):
+            return 1
+        elif(Y >= len(self.map) or X < 0 or X >= len(self.map[Y])):
             return 0
         return self.map[Y][X]
     
@@ -56,7 +72,17 @@ class Level:
                        self.playerPos[1] + Level.ViewHeight//2+1):
             for x in range(self.playerPos[0] - Level.ViewWidth//2,
                            self.playerPos[0] + Level.ViewWidth//2+1):
-                ret += [self.getBlock(x, y)]
+                b = self.getBlock(x,y)
+                if b == 0:
+                    ret += [0,0]
+                elif b == 1:
+                    ret += [0,1]
+                elif b == 2:
+                    ret += [1,0]
+                elif b == 3:
+                    ret += [1,1]
+                else:
+                    print("error!")
         return ret
     
     def moveUp(self):
@@ -87,14 +113,16 @@ class Level:
         self.previousPos = tuple(self.playerPos)
         Level.Actions[index](self)
         self.steps += 1
-        ret = None
-        if(self.getBlock(self.playerPos[0], self.playerPos[1]) == 0 or self.steps >= 30):
-            ret = (False, -self.previousPos[1], -self.steps)
+        if(self.isDead(self.getBlock(self.playerPos[0], self.playerPos[1])) or self.steps >= 30):
             self.Reset()
-        if(self.playerPos[1] == 0):
-            ret = (True, -self.steps)
+            return (self.playerPos[1],True)
+        elif(self.playerPos[1] <= 0):
             self.Reset()
-        return ret
+            return (self.playerPos[1], True)
+        return (self.playerPos[1], False)
+
+    def isDead(self, block):
+        return random.random() > Level.SurvivalChance[block]
     
     def Reset(self):
         self.playerPos = list(self.initialPos)
@@ -108,6 +136,10 @@ class Level:
                     s += "X"
                 elif(char == 1):
                     s += "1"
+                elif(char == 2):
+                    s += "2"
+                elif(char == 3):
+                    s += "3"
                 else:
                     s += "0"
             s += "\n"
@@ -122,3 +154,5 @@ class Level:
                jumpLeft,
                jumpRight,
                jumpDown]
+
+    SurvivalChance = [0.,1.,0.5,0.25]
