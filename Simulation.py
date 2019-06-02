@@ -73,16 +73,7 @@ class Level:
             for x in range(self.playerPos[0] - Level.ViewWidth//2,
                            self.playerPos[0] + Level.ViewWidth//2+1):
                 b = self.getBlock(x,y)
-                if b == 0:
-                    ret += [0,0]
-                elif b == 1:
-                    ret += [0,1]
-                elif b == 2:
-                    ret += [1,0]
-                elif b == 3:
-                    ret += [1,1]
-                else:
-                    print("error!")
+                ret += [Level.SurvivalChance(b)]
         return ret
     
     def moveUp(self):
