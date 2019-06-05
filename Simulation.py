@@ -106,11 +106,11 @@ class Level:
         self.steps += 1
         if(self.isDead(self.getBlock(self.playerPos[0], self.playerPos[1])) or self.steps >= 30):
             self.Reset()
-            return (self.playerPos[1],True)
+            return (self.playerPos[1],self.steps, True)
         elif(self.playerPos[1] <= 0):
             self.Reset()
-            return (0, True)
-        return (self.playerPos[1], False)
+            return (0, self.steps, True)
+        return (self.playerPos[1], self.steps, False)
 
     def isDead(self, block):
         return random.random() > Level.SurvivalChance[block]
