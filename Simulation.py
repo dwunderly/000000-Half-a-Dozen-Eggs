@@ -27,8 +27,8 @@ import random
 
 class Level:
     
-    ViewWidth = 7
-    ViewHeight = 7
+    ViewWidth = 5
+    ViewHeight = 5
     
     def __init__(self, stringArray):
         self.initialPos = None
@@ -73,7 +73,7 @@ class Level:
             for x in range(self.playerPos[0] - Level.ViewWidth//2,
                            self.playerPos[0] + Level.ViewWidth//2+1):
                 b = self.getBlock(x,y)
-                ret += [Level.SurvivalChance[b]]
+                ret += Level.BlockType[b]
         return ret
     
     def moveUp(self):
@@ -146,4 +146,5 @@ class Level:
                jumpRight,
                jumpDown]
 
-    SurvivalChance = [0.,1.,0.5,0.25]
+    SurvivalChance = [0.,1.,0.5]
+    BlockType = [(1.,0.,0.), (0.,1.,0.), (0.,0.,1.)]

@@ -82,7 +82,7 @@ if __name__ == "__main__":
     import Simulation
     import matplotlib.pyplot as plt
     
-    g = Generation(20,(98,20,8))
+    g = Generation(20,(75,20,8))
     l = Simulation.Level(Simulation.l)
     px = []
     py = []
