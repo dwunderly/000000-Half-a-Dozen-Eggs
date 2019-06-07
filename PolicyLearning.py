@@ -145,14 +145,14 @@ GridDict = {0: (1.,0.,0.),
             2: (0.,0.,1.)}
 
 class PolicyLearner:
-    def __init__(self, rFunc):
+    def __init__(self, rFunc = rfunc0):
         self.rFunc = rFunc
 
     def step(self, floorGrid):
         state = []
         for b in floorGrid:
             state += GridDict[b]
-        return select_action(np.asarray(state))
+        return select_action(np.asarray(state)).item()
     
     def update(self, x, step, done):
         reward = self.rFunc(x,steps,done)
