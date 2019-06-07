@@ -155,7 +155,7 @@ class PolicyLearner:
         return select_action(np.asarray(state)).item()
     
     def update(self, x, step, done):
-        reward = self.rFunc(x,steps,done)
+        reward = self.rFunc(x,step,done)
         policy.reward_episode.append(reward)
 
     def learn(self):
