@@ -140,6 +140,27 @@ def rfunc3(x, steps, done):
 def rfunc4(x, steps, done):
     return 5-x
 
+GridDict = {0: (1.,0.,0.),
+            1: (0.,1.,0.),
+            2: (0.,0.,1.)}
+
+class PolicyLearner:
+    def __init__(self, rFunc):
+        self.rFunc = rFunc
+
+    def step(self, floorGrid):
+        state = []
+        for b in floorGrid:
+            state += GridDict[b]
+        return select_action(np.asarray(state))
+    
+    def update(self, x, step, done):
+        reward = self.rFunc(x,steps,done)
+        policy.reward_episode.append(reward)
+
+    def learn(self):
+        update_policy()
+
 '''
 def main(episodes):
     for episode in range(episodes):
