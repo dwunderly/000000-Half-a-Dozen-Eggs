@@ -158,6 +158,8 @@ class PolicyLearner:
         policy.reward_episode.append(reward)
 
     def learn(self):
+        global epsilon
+        global episodeNumber
         update_policy()
         episodeNumber += 1
         epsilon = 1/(math.log(episodeNumber+1,2)+1)
