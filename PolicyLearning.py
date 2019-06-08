@@ -61,6 +61,10 @@ def select_action(state):
     
     action = c.sample()
 
+    if(random.random() < 0.1):
+        action = torch.Tensor(1, dtype=torch.int)
+        action.data = random.randint(0,7)
+
         
     if policy.policy_history.nelement() == 0:
         policy.policy_history = torch.stack([c.log_prob(action)])
