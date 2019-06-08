@@ -8,6 +8,7 @@ from torch.distributions import Categorical
 import torchvision
 import torchvision.transforms as transforms
 import numpy as np
+import math
 
 # Hyperparameters
 agent_view = 5*5*3
@@ -15,7 +16,9 @@ agent_choices = 8
 learning_rate = 0.001
 gamma = 0.99
 hidden_size = 128
-dropout_prob = 0.3
+dropout_prob = 0
+epsilon = 0.1
+episodeNumber = 0
 
 class Policy(nn.Module):
     def __init__(self):
@@ -58,28 +61,20 @@ def select_action(state):
     state = torch.from_numpy(state).type(torch.FloatTensor)
     choices = policy(Variable(state))
     c = Categorical(choices)
-    
     action = c.sample()
-
-    if(random.random() < 0.1):
-        action = torch.Tensor(1, dtype=torch.int)
-        action.data = random.randint(0,7)
-
-        
+    
+    if(random.random() < epsilon):
+        tempArray = np.array([0.125,0.125,0.125,0.125,0.125,0.125,0.125,0.125])
+        choices2 = torch.Tensor(tempArray)
+        c2 = Categorical(choices2)
+        action = c2.sample()
+    
     if policy.policy_history.nelement() == 0:
         policy.policy_history = torch.stack([c.log_prob(action)])
     else:
         policy.policy_history = torch.cat([policy.policy_history, torch.stack([c.log_prob(action)])])
-    
-    '''
-    if policy.policy_history.size()[0] > 1:
-        policy.policy_history = torch.cat([policy.policy_history, c.log_prob(action)])
-    elif policy.policy_history.nelement() != 0:
-        policy.policy_history = torch.stack([policy.policy_history, c.log_prob(action)])
-    else:
-        policy.policy_history = (c.log_prob(action))
-    '''
-    return action
+
+    return int(action)
 
 # We apply Monte-Carlo Policy Gradient to improve out policy according
 # to the equation
@@ -164,6 +159,8 @@ class PolicyLearner:
 
     def learn(self):
         update_policy()
+        episodeNumber += 1
+        epsilon = 1/(math.log(episodeNumber+1,2)+1)
 
 '''
 def main(episodes):
