@@ -151,7 +151,7 @@ class PolicyLearner:
         state = []
         for b in floorGrid:
             state += GridDict[b]
-        return select_action(np.asarray(state)).item()
+        return select_action(np.asarray(state))
     
     def update(self, x, step, done):
         reward = self.rFunc(x,step,done)
