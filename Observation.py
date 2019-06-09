@@ -11,17 +11,24 @@ import time
 import json
 from random import randrange
 from math import *
-from EvolutionaryAlgorithm import *
+from PolicyLearning import *
 
 key = [ \
+"0131010", \
+"0111010", \
+"0013110", \
+"0101110", \
+"0113130", \
+"0110100", \
+"0113130", \
 "0111110", \
-"0111110", \
-"0111110", \
-"0111110", \
-"0102010" \
+"0101300", \
+"0111310", \
+"0301110", \
+"0112110"  \
 ]
 
-blockTypes = ["air", "stone", "gold_block", "sand"]
+blockTypes = ["air", "stone", "gold_block", "redstone_block"]
 spawn = {'x': 0, 'y': 55, 'z': 0}
 def drawBlock(type, x, y, z):
 	return '<DrawBlock x="{}" y="{}" z="{}" type="{}"/>\n'.format(x,y,z,type)
@@ -169,27 +176,33 @@ def getFloor():
 	for g in grid:
 		if (g == "air"):
 			floorGrid.append(0)
+		elif (g == "redstone_block"):
+			floorGrid.append(2)
 		else:
 			floorGrid.append(1)
 	return floorGrid
 	
 def purgatory(x, z):
+	count = 0
 	while(True):
 		if (updateState()):
+			if (count == 10):
+				return
+			count += 1
 			if (observations["XPos"] == x):
 				if (observations["ZPos"] == z):
-					return;
+					return
 		time.sleep(0.05)
 
-def movementLoop(ml, index):
+def movementLoop(p):
 	steps = 0
 	while world_state.is_mission_running:
 		updateState()
 		x = observations["XPos"]
 		z = observations["ZPos"]
 		floorGrid = getFloor()
-		i = ml.step(floorGrid,index)
-		print("      Command: {}".format(i))
+		i = p.step(floorGrid)
+		#print("      Command: {}".format(i))
 		#Walk Forward
 		if (i == 0):
 			#walkDirection(-180)
@@ -206,34 +219,34 @@ def movementLoop(ml, index):
 			agent_host.sendCommand("strafe 1")
 			x -= 1
 		#Walk Backward
-		elif (i == 3):
+		#elif (i == 3):
 			#walkDirection(90)
-			agent_host.sendCommand("move -1")
-			z -= 1
+			#agent_host.sendCommand("move -1")
+			#z -= 1
 		#Jump Forward
-		elif (i == 4):
+		elif (i == 3):
 			#walkDirection(-180)
 			agent_host.sendCommand("jumpmove 1")
 			agent_host.sendCommand("move 1")
 			z += 2
 		#Jump Left
-		elif (i == 5):
+		elif (i == 4):
 			#walkDirection(0)
 			agent_host.sendCommand("jumpstrafe -1")
 			agent_host.sendCommand("strafe -1")
 			x += 2
 		#Jump Right
-		elif (i == 6):
+		elif (i == 5):
 			#walkDirection(-90)
 			agent_host.sendCommand("jumpstrafe 1")
 			agent_host.sendCommand("strafe 1")
 			x -= 2
 		#Jump Backward
-		elif (i == 7):
+		#elif (i == 7):
 			#walkDirection(90)
-			agent_host.sendCommand("jumpmove -1")
-			agent_host.sendCommand("move -1")
-			z -= 2
+			#agent_host.sendCommand("jumpmove -1")
+			#agent_host.sendCommand("move -1")
+			#z -= 2
 		
 		if (i <= 3):
 			steps += 1
@@ -242,51 +255,58 @@ def movementLoop(ml, index):
 			steps += 2
 		#time.sleep(.5)
 		#updateState()
-		print("      steps: {}".format(steps))
+		#print("      steps: {}".format(steps))
 		#while(not updateState()):
 			#time.sleep(0.05)
 		#time.sleep(0.25)
-		print("      x: {}".format(x))
-		print("      z: {}".format(z))
+		#print("      x: {}".format(x))
+		#print("      z: {}".format(z))
 		purgatory(x,z)
 		floorGrid = getFloor()
 			
 		#printFloor(floorGrid)
-		dead = not floorGrid[coords(0,0)]
+		dead = False;
+		if (floorGrid[coords(0,0)] == 0):
+			dead = True
+		elif (floorGrid[coords(0,0)] == 2):
+			i = random.randrange(10)
+			if (i < 2):
+				dead = True
+				
 		distance = observations["ZPos"]
-		
+		done = False
 		if dead :
-			return False, distance, -steps
+			done = True
 		if distance >= 0:
-			return True, 0.0, -steps
-		if steps >= 10:
-			return False, distance, -steps
+			done = True
+			distance = 0.0
+		if steps >= 20:
+			done = True
+			
+		p.update(abs(distance), steps, done)
+		
+		if done:
+			return
 	exit()
 
 if __name__ == "__main__":
-	INDEX_MAX = 20
-	ml = Generation(INDEX_MAX, (25, 10, 8))
 	setup()
-	generations = 0
 	agent_host.sendCommand("look 1")
-	agent_host.sendCommand("look 1")
+	#agent_host.sendCommand("look 1")
 	agent_host.sendCommand("tp {} {} {}".format(spawn['x'],spawn['y'],spawn['z']))
 	purgatory(spawn['x'],spawn['z'])
+	p = PolicyLearner()
+	episode = 0;
 	while(True):
-		ml.beginGeneration()
-		generations += 1
-		print("starting gen {}".format(generations))
-		for index in range(0,INDEX_MAX):
-			print("  Index {}".format(index))
-			stats = movementLoop(ml, index)
-			print("    Succeeded: {}".format(stats[0]))
-			print("    Distance: {}".format(stats[1]))
-			print("    Steps: {}".format(stats[2]))
-			ml.update(stats, index)
-			agent_host.sendCommand("tp {} {} {}".format(spawn['x'],spawn['y'],spawn['z']))
-			purgatory(spawn['x'],spawn['z'])
-		ml.endGeneration()
-		print("Best of Iteration: {}".format(ml.generationT[-1][0]))
+		episode += 1
+		print("Episode: {}".format(episode))
+		movementLoop(p)
+		p.learn()
+		#print("    Succeeded: {}".format(stats[0]))
+		#print("      Distance: {}".format(stats[1]))
+		#print("      Steps: {}".format(stats[2]))
+		agent_host.sendCommand("tp {} {} {}".format(spawn['x'],spawn['y'],spawn['z']))
+		purgatory(spawn['x'],spawn['z'])
 	print()
 	print("Mission ended")
 	# Mission has ended.

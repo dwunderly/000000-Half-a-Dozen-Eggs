@@ -12,9 +12,9 @@ import math
 
 # Hyperparameters
 agent_view = 5*5*3
-agent_choices = 8
+agent_choices = 6
 learning_rate = 0.001
-gamma = 0.99
+gamma = 0.97
 hidden_size = 128
 dropout_prob = 0
 epsilon = 0.1
@@ -64,7 +64,7 @@ def select_action(state):
     action = c.sample()
     
     if(random.random() < epsilon):
-        tempArray = np.array([0.125,0.125,0.125,0.125,0.125,0.125,0.125,0.125])
+        tempArray = np.array([0.125,0.125,0.125,0.125,0.125,0.125])
         choices2 = torch.Tensor(tempArray)
         c2 = Categorical(choices2)
         action = c2.sample()
@@ -79,6 +79,10 @@ def select_action(state):
 # We apply Monte-Carlo Policy Gradient to improve out policy according
 # to the equation
 def update_policy():
+    
+    print("Rewards:")
+    for reward in policy.reward_episode:
+        print("  {}".format(reward))
     
     R = 0
     rewards = []
@@ -111,13 +115,13 @@ def rfunc0(x,steps,done):
     reward = 0
     if done:
         if(x <= 0):
-            reward = 1000
+            reward = 100000000000 - (20*steps)
         else:
-            reward = -1000
+            reward = -1000 + 20 * (10 - x)
     else:
-        reward = 1/(x+2)
+        reward = 10000 - (200*x)
     #reward -= steps/4
-    return reward
+    return reward+1000
 
 
 def rfunc1(x,steps,done):
