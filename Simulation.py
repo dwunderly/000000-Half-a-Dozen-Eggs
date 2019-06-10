@@ -124,6 +124,9 @@ class Level:
         self.playerPos = list(self.initialPos)
         self.steps = 0
 
+    def getLivingRewardState(self):
+        return (self.playerPos[1], self.steps, False)
+
     def __str__(self):
         s = ""
         for y, row in enumerate(self.map):
@@ -145,11 +148,9 @@ class Level:
     Actions = [moveUp,
                moveLeft,
                moveRight,
-               moveDown,
                jumpUp,
                jumpLeft,
-               jumpRight,
-               jumpDown]
+               jumpRight]
 
     SurvivalChance = [0.,1.,0.5]
     BlockType = [(1.,0.,0.), (0.,1.,0.), (0.,0.,1.)]
