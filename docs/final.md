@@ -38,11 +38,15 @@ Additionally, in order to speed up training time and test the efficacy of our ap
 
 We evaluated our agent on the same simulator discussed in the status report in order to gain more data more quickly. Below are some levels we designed to test various capabilities of the agent.
 
-<img src="Med_Complex_1.png" width = "20%"><img src="Med_Complex_2.png" width = "20%"><img src="Med_Complex_3.png" width = "20%">
+| | | |
+| - | - | - |
+|<img src="Med_Complex_1.png" width = "20%">|<img src="Med_Complex_2.png" width = "20%">|<img src="Med_Complex_3.png" width = "20%">|
 
 As we see in this medium difficulty level, the agent first seeks out any possible path it can take to the end, then optimizes its route.
 
-<img src="Simple_1.png" width = "20%"><img src="Simple_1.png" width = "20%"><img src="Simple_1.png" width = "20%">
+| | | |
+| - | - | - |
+|<img src="Simple_1.png" width = "20%">|<img src="Simple_1.png" width = "20%">|<img src="Simple_1.png" width = "20%">|
 
 In the case of a simple but unsafe environment, we could control if the agent sought speed or safety based on how we modified the agent’s reward function.
 We defined a difficult or complicated map to require the agent to move both left and right at different points. The map below was first solved on iteration 849 out of 1000:
