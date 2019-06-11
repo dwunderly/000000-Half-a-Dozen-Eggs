@@ -8,8 +8,6 @@ title: Final Report
 
 ## Project Summary
 
-| AstarCompare.png | OurTrainedAlgorithm.png |
-| - | - |
 |<img src="AstarCompare.png">|<img src="OurTrainedAlgorithm.png">|
 
 The agent will attempt to navigate towards a known goal in a 2D platforming environment. The environment will have three main types of blocks: air, redstone, and stone. It can walk normally on a stone block, and will die if it walks into an air block. The redstone block has an interesting effect where the agent has a low chance of dying if it walks on a redstone block.  
@@ -38,15 +36,13 @@ Additionally, in order to speed up training time and test the efficacy of our ap
 
 We evaluated our agent on the same simulator discussed in the status report in order to gain more data more quickly. Below are some levels we designed to test various capabilities of the agent.
 
-| | | |
-| - | - | - |
-|<img src="Med_Complex_1.png" width = "20%">|<img src="Med_Complex_2.png" width = "20%">|<img src="Med_Complex_3.png" width = "20%">|
+
+|<img src="Med_Complex_1.png">|<img src="Med_Complex_2.png">|<img src="Med_Complex_3.png">|
 
 As we see in this medium difficulty level, the agent first seeks out any possible path it can take to the end, then optimizes its route.
 
-| | | |
-| - | - | - |
-|<img src="Simple_1.png" width = "20%">|<img src="Simple_1.png" width = "20%">|<img src="Simple_1.png" width = "20%">|
+
+|<img src="Simple_1.png">|<img src="Simple_1.png">|<img src="Simple_1.png">|
 
 In the case of a simple but unsafe environment, we could control if the agent sought speed or safety based on how we modified the agent’s reward function.
 We defined a difficult or complicated map to require the agent to move both left and right at different points. The map below was first solved on iteration 849 out of 1000:
