@@ -8,9 +8,9 @@ title: Final Report
 
 ## Project Summary
 
-| Image1 | Image2 |
+| AstarCompare.png | OurTrainedAlgorithm.png |
 | - | - |
-|<img src="AstarCompare.png" width = "40%" style="float:right">|<img src="OurTrainedAlgorithm.png" width = "40%" style="float:left">|
+|<img src="AstarCompare.png">|<img src="OurTrainedAlgorithm.png">|
 
 The agent will attempt to navigate towards a known goal in a 2D platforming environment. The environment will have three main types of blocks: air, redstone, and stone. It can walk normally on a stone block, and will die if it walks into an air block. The redstone block has an interesting effect where the agent has a low chance of dying if it walks on a redstone block.  
 The agent will be “nearsighted” and take in a 5x5 grid of our immediate surroundings as its input. It will then try to predict the best course of action from the following set of actions: step up, step left, step right, jump up, jump left, and jump right. For every action it takes it will get a reward based on whether it made it to the goal, its distance to the goal, and number of steps it has taken. 
