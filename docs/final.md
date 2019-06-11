@@ -8,6 +8,7 @@ title: Final Report
 
 ## Project Summary
 
+| | |
 | - | - |
 |<img src="AstarCompare.png">|<img src="OurTrainedAlgorithm.png">|
 
@@ -37,11 +38,13 @@ Additionally, in order to speed up training time and test the efficacy of our ap
 
 We evaluated our agent on the same simulator discussed in the status report in order to gain more data more quickly. Below are some levels we designed to test various capabilities of the agent.
 
+| | | |
 | - | - | - |
 |<img src="Med_Complex_1.png">|<img src="Med_Complex_2.png">|<img src="Med_Complex_3.png">|
 
 As we see in this medium difficulty level, the agent first seeks out any possible path it can take to the end, then optimizes its route.
 
+| | | |
 | - | - | - |
 |<img src="Simple_1.png">|<img src="Simple_1.png">|<img src="Simple_1.png">|
 
