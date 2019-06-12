@@ -23,12 +23,19 @@ The first approach is evolutionary learning, where the A.I. currently trains wit
 
 The second approach is reinforcement learning using policy gradients. Policy gradients allow us to train an agent by taking small steps and updating the policy function below based on the reward returned from that step. These rewards can be either sent immediately to the agent or sent at the end of an episode (attempt at solving the maze). 
 
+<img src="Untitled.png">
 
 For this project, we applied Monte-Carlo Policy Gradient, which means that we run through an episode, grab all rewards for each step, and update our policy based on those rewards.
 
+<img src="Untitled1.png">
+
 The action value function above represents the expected return given a certain state-action pair. That function is used in the discounted reward vector function below to calculate the total reward over an episode.
 
+<img src="Untitled2.png">
+
 The reward vector is then factored into the loss function, and we take the loss function’s gradient (can be seen below) to take small steps towards the “goal.”
+
+<img src="Untitled3.png">
 
 In our application, the goal is for the agent to be able to make the correct decision based on its 5x5 views it gets every move it makes in an episode. Eventually, the agent should be able to understand its inputs and rewards to solve any given 2D maze. 
 
